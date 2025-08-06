@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getUser } from '../../services/api';
+import { getUser, login } from '../../services/api';
 import { Search, Bell } from '../icons/LucideIcons'; // Assuming LucideIcons is in ../icons
 import { Avatar } from '../ui/Avatar'; // Assuming Avatar is in ../ui
 
 const Header = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getUser().then(setUser);
+    getUser()
+      .then(setUser)
+      .catch((err) => setError(err.message));
   }, []);
+
+  const handleLogin = async () => {
+    try {
+      await login('admin', 'admin');
+      const userData = await getUser();
+      setUser(userData);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const getTitle = () => {
     const path = location.pathname;
@@ -58,6 +72,14 @@ const Header = () => {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
           </span>
         </button>
+        {error && (
+          <button
+            onClick={handleLogin}
+            className="px-4 py-2 bg-sbp-brand-500 text-white rounded-lg hover:bg-sbp-brand-600"
+          >
+            Login
+          </button>
+        )}
         {user ? (
           <div className="flex items-center gap-3">
             {/* Assuming Avatar component is available */}
@@ -72,7 +94,7 @@ const Header = () => {
             </div>
           </div>
         ) : (
-          <div className="w-48 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+          !error && <div className="w-48 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
         )}
       </div>
     </header>

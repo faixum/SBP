@@ -1,3 +1,2 @@
 #!/bin/sh
-source .venv/bin/activate
-python mysite/manage.py runserver $PORT
+python mysite/manage.py runserver ${PORT:-8000}
