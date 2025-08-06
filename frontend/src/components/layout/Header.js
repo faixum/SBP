@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { getUser } from '../../services/api';
 import { Search, Bell } from '../icons/LucideIcons'; // Assuming LucideIcons is in ../icons
 import { Avatar } from '../ui/Avatar'; // Assuming Avatar is in ../ui
 
 const Header = () => {
   const location = useLocation();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getUser().then(setUser);
+  }, []);
 
   const getTitle = () => {
     const path = location.pathname;
@@ -30,7 +36,9 @@ const Header = () => {
     <header className="flex items-center justify-between h-24 px-8 bg-transparent">
       <div>
         <h1 className="text-2xl font-bold text-gray-800">{getTitle()}</h1>
-        <p className="text-gray-500">Welcome back, Ahmad!</p>
+        <p className="text-gray-500">
+          {user ? `Welcome back, ${user.name}!` : 'Loading...'}
+        </p>
       </div>
       <div className="flex items-center gap-6">
         <div className="relative">
@@ -50,18 +58,22 @@ const Header = () => {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
           </span>
         </button>
-        <div className="flex items-center gap-3">
-          {/* Assuming Avatar component is available */}
-          {/* <Avatar
-            src="https://i.pravatar.cc/40?u=admin"
-            fallback="AR"
-            className="w-10 h-10"
-          /> */}
-          <div>
-            <p className="font-semibold text-sm text-gray-800">Ahmad Rahman</p>
-            <p className="text-xs text-gray-500">Administrator</p>
+        {user ? (
+          <div className="flex items-center gap-3">
+            {/* Assuming Avatar component is available */}
+            {/* <Avatar
+              src={user.avatarUrl}
+              fallback={user.name.charAt(0)}
+              className="w-10 h-10"
+            /> */}
+            <div>
+              <p className="font-semibold text-sm text-gray-800">{user.name}</p>
+              <p className="text-xs text-gray-500">{user.role}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="w-48 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+        )}
       </div>
     </header>
   );
